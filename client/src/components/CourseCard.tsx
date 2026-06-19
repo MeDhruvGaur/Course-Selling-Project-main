@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Star, User } from "lucide-react";
+import { Star, User, ShoppingCart, Check } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { addToCartApi, getCartApi } from "../services/api";
+import { message } from "antd";
+import useAuthStore from "../store/store";
 
 interface CourseCardProps {
   course: Course;
@@ -9,6 +13,53 @@ interface CourseCardProps {
 
 const CourseCard = ({ course, index = 0 }: CourseCardProps) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuthStore();
+
+  // Get cart data to check if course is already in cart
+  const { data: cart } = useQuery({
+    queryKey: ["cart"],
+    queryFn: async () => {
+      const { data } = await getCartApi();
+      return data.data as Cart;
+    },
+    enabled: isAuthenticated,
+  });
+
+  const isInCart = cart?.courses?.some(
+    (item: any) => item.course?._id === course._id || item.course === course._id
+  ) ?? false;
+
+  const { mutate: addToCart, isPending: isAddingToCart } = useMutation({
+    mutationKey: ["addToCart", course._id],
+    mutationFn: async () => {
+      const { data } = await addToCartApi(course._id);
+      return data;
+    },
+    onSuccess: () => {
+      message.success(`"${course.title}" added to cart!`);
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onError: (error: any) => {
+      message.error(
+        error?.response?.data?.message || "Failed to add to cart"
+      );
+    },
+  });
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation(); // prevent card navigation
+    if (!isAuthenticated) {
+      message.info("Please login to add courses to your cart");
+      navigate("/login");
+      return;
+    }
+    if (isInCart) {
+      navigate("/cart");
+      return;
+    }
+    addToCart();
+  };
 
   // Get instructor name — could be an array (from aggregation) or object
   const instructor = Array.isArray(course.instructor)
@@ -52,6 +103,42 @@ const CourseCard = ({ course, index = 0 }: CourseCardProps) => {
             </span>
           </div>
         )}
+
+        {/* Quick Add to Cart — hover overlay button */}
+        <motion.button
+          className={`absolute bottom-3 right-3 flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg transition-all duration-200 ${
+            isInCart
+              ? "bg-emerald-500 text-white"
+              : "bg-lms-gold-500 text-lms-blue-950 hover:bg-lms-gold-400"
+          }`}
+          onClick={handleAddToCart}
+          disabled={isAddingToCart}
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ delay: index * 0.08 + 0.2 }}
+          whileTap={{ scale: 0.95 }}
+          title={isInCart ? "Go to Cart" : "Add to Cart"}
+        >
+          {isAddingToCart ? (
+            <span className="flex items-center gap-1">
+              <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Adding...
+            </span>
+          ) : isInCart ? (
+            <>
+              <Check className="w-3 h-3" />
+              In Cart
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="w-3 h-3" />
+              Add to Cart
+            </>
+          )}
+        </motion.button>
       </div>
 
       {/* Content */}
@@ -89,18 +176,51 @@ const CourseCard = ({ course, index = 0 }: CourseCardProps) => {
           </span>
         </div>
 
-        {/* Price — pushed to bottom */}
+        {/* Price + Cart button */}
         <div className="mt-auto pt-3 border-t border-slate-50 flex items-center gap-2">
-          <span className="text-xl font-extrabold text-slate-900">
-            ₹{course.price?.toLocaleString()}
-          </span>
-          <span className="text-sm text-slate-400 line-through">
-            ₹{(course.price * 2.5).toLocaleString()}
-          </span>
-          <span className="text-xs font-bold text-green-600 ml-auto bg-green-50 px-2 py-0.5 rounded-full">
-            60% OFF
-          </span>
+          <div className="flex items-center gap-2 flex-1">
+            <span className="text-xl font-extrabold text-slate-900">
+              ₹{course.price?.toLocaleString()}
+            </span>
+            <span className="text-sm text-slate-400 line-through">
+              ₹{(course.price * 2.5).toLocaleString()}
+            </span>
+            <span className="text-xs font-bold text-green-600 ml-auto bg-green-50 px-2 py-0.5 rounded-full">
+              60% OFF
+            </span>
+          </div>
         </div>
+
+        {/* Add to Cart — always-visible footer button */}
+        <button
+          onClick={handleAddToCart}
+          disabled={isAddingToCart}
+          className={`mt-3 w-full flex items-center justify-center gap-2 text-sm font-bold py-2.5 rounded-xl transition-all duration-200 ${
+            isInCart
+              ? "bg-emerald-50 text-emerald-700 border-2 border-emerald-200 hover:bg-emerald-100"
+              : "bg-lms-blue-950 text-white hover:bg-lms-blue-800 border-2 border-lms-blue-950"
+          }`}
+        >
+          {isAddingToCart ? (
+            <>
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Adding to Cart...
+            </>
+          ) : isInCart ? (
+            <>
+              <Check className="w-4 h-4" />
+              Go to Cart
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="w-4 h-4" />
+              Add to Cart
+            </>
+          )}
+        </button>
       </div>
     </motion.div>
   );

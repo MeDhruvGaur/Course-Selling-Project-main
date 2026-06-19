@@ -12,34 +12,37 @@ import mongoose from "mongoose";
 const createCourse = asyncHandler(async(req, res)=>{
     const {title, description, price, features} = req.body;
 
-    if(title?.trim() === ""){
+    if(!title?.trim()){
       throw new ApiErrorHandler(res, 400, "Title is required");
     }
 
-    if(description?.trim() === ""){
+    if(!description?.trim()){
       throw new ApiErrorHandler(res, 400, "Description is required");
     }
 
-    if(price?.trim() === ""){
+    if(price === undefined || price === null || price === ""){
       throw new ApiErrorHandler(res, 400, "Price is required");
     }
 
-    if(features?.trim() === ""){
+    if(!features?.trim()){
       throw new ApiErrorHandler(res, 400, "Features is required");
     }
 
-    const image = req.file?.path;
-  // if image is available, upload it to cloudinary else set it to null
-  const imageResult = image ? await uploadOnCloudinary(image) : null;
-
+    // Upload image to Cloudinary if provided; otherwise store null
+    const imageFile = req.file?.path;
+    let imageUrl = null;
+    if (imageFile) {
+      const imageResult = await uploadOnCloudinary(imageFile);
+      imageUrl = imageResult ? imageResult.secure_url : null;
+    }
 
     const course = await Course.create({
-      title,
-      description,
+      title: title.trim(),
+      description: description.trim(),
       price,
-      features: features,
+      features: features.trim(),
       instructor: req.user._id,
-    image: imageResult ? imageResult.secure_url : null,
+      image: imageUrl,   // null is fine — model no longer requires it
     });
 
     if(!course){
@@ -53,13 +56,9 @@ const createCourse = asyncHandler(async(req, res)=>{
 })
 
 
+// All courses — used on the public homepage
 const getAllCourses = asyncHandler(async(req, res)=>{
    const courses = await Course.aggregate([
-    // {
-    //     $match: {
-    //         instructor: new mongoose.Types.ObjectId(req.user._id),
-    //     },
-    // },
     {
       $lookup: {
         from: "users",
@@ -84,6 +83,38 @@ const getAllCourses = asyncHandler(async(req, res)=>{
    }
 
    return res.status(200).json(new ApiResponse(200, courses, "Courses fetched successfully"));
+})
+
+
+// My courses — only courses created by the logged-in instructor/admin
+const getMyCourses = asyncHandler(async(req, res)=>{
+   const courses = await Course.aggregate([
+    {
+      $match: {
+        instructor: new mongoose.Types.ObjectId(req.user._id),
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "instructor",
+        foreignField: "_id",
+        as: "instructor",
+        pipeline: [
+          {
+            $project: {
+              fullName: 1,
+              email: 1,
+              avatar: 1,
+            },
+          },
+        ],
+      },
+    },
+   ])
+
+   // Return empty array instead of 404 if no courses yet
+   return res.status(200).json(new ApiResponse(200, courses, "My courses fetched successfully"));
 })
 
 const getCourseDetails = asyncHandler(async(req, res)=>{
@@ -130,11 +161,15 @@ const removeCourse = asyncHandler(async(req, res)=>{
     throw new ApiErrorHandler(res, 400, "Course ID is required");
   }
 
-const existingCourse = await Course.findById(courseId);
+  const existingCourse = await Course.findById(courseId);
   if(!existingCourse) 
     throw new ApiErrorHandler(res, 404, "Course not found");
-  
-  if(!existingCourse.instructor.equals(req.user._id)){
+
+  // Admins can delete any course; Instructors can only delete their own
+  const isAdmin = req.user.role === "Admin";
+  const isOwner = existingCourse.instructor.equals(req.user._id);
+
+  if(!isAdmin && !isOwner){
     throw new ApiErrorHandler(res, 403, "You are not authorized to delete this course");
   }
 
@@ -159,16 +194,20 @@ const updateCourse = asyncHandler(async(req, res)=>{
   const existingCourse = await Course.findById(courseId);
   if(!existingCourse) 
     throw new ApiErrorHandler(res, 404, "Course not found");
-  
-  if(!existingCourse.instructor.equals(req.user._id)){
+
+  // Admins can update any course; Instructors can only update their own
+  const isAdmin = req.user.role === "Admin";
+  const isOwner = existingCourse.instructor.equals(req.user._id);
+
+  if(!isAdmin && !isOwner){
     throw new ApiErrorHandler(res, 403, "You are not authorized to update this course");
   }
 
   const course = await Course.findByIdAndUpdate(courseId, {
-    title,
-    description,
-    price,
-    features: features,
+    ...(title && { title }),
+    ...(description && { description }),
+    ...(price !== undefined && { price }),
+    ...(features && { features }),
   }, 
   {
     new: true,
@@ -185,6 +224,7 @@ const updateCourse = asyncHandler(async(req, res)=>{
 export {
     createCourse,
     getAllCourses,
+    getMyCourses,
     getCourseDetails,
     removeCourse,
     updateCourse

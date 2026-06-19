@@ -10,7 +10,7 @@ const addToCart = asyncHandler(async(req, res)=>{
     const user = await User.findById(req.user?._id);
     
     const {courseId} = req.body;
-       if(!courseId?.trim() || !courseId?.trim()?.length === 0){
+    if(!courseId?.trim()){
         throw new ApiErrorHandler(res, 400, "Course ID is required");
     }
     if(!user){
@@ -73,7 +73,7 @@ const getCart = asyncHandler(async(req, res)=>{
 const removeFromCart = asyncHandler(async(req, res)=>{
     const user = await User.findById(req.user?._id);
     const {courseId} = req.params;
-       if(!courseId?.trim() || !courseId?.trim()?.length === 0){
+    if(!courseId?.trim()){
         throw new ApiErrorHandler(res, 400, "Course ID is required");
     }
     if(!user){

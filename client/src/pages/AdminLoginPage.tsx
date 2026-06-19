@@ -31,7 +31,7 @@ const LoginPage = () => {
   // Login Mutation
   const { mutate, isPending } = useMutation({
     mutationKey: ["login"],
-    mutationFn: async (payload) => {
+    mutationFn: async (payload: any) => {
       const { data } = await loginApi(payload);
       return data.data;
     },
@@ -46,7 +46,7 @@ const LoginPage = () => {
       navigate("/admin/dashboard");
     },
 
-    onError: (error) => {
+    onError: (error: any) => {
       message.error(
         error?.response?.data?.message ||
         "Invalid email or password. Please try again.",
@@ -55,7 +55,7 @@ const LoginPage = () => {
   });
 
   // Submit Handler
-  const handleLogin = (values) => {
+  const handleLogin = (values: any) => {
     mutate({
       email: values.email,
       password: values.password,

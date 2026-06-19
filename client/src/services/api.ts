@@ -12,15 +12,16 @@ export const logoutApi = async () => api.post("users/logout");
 // Courses
 export const getAllCoursesApi = async () => api.get("courses/");
 
+export const getMyCoursesApi = async () => api.get("courses/my-courses");
+
 export const getCourseDetailsApi = async (courseId: string) =>
   api.get(`courses/${courseId}`);
 
 export const createCourseApi = async (data: FormData) =>
-  api.post("courses/create", data, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  api.post("courses/create", data);
+
+export const deleteCourseApi = async (courseId: string) =>
+  api.delete(`courses/${courseId}`);
 
 // Cart
 export const getCartApi = async () => api.get("cart");

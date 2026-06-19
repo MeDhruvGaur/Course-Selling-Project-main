@@ -24,3 +24,24 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     throw new ApiError(401, error?.message || "Invalid access Token");
   }
 });
+
+/**
+ * Middleware to restrict access to users with specific roles.
+ * @param {string[]} allowedRoles - Array of allowed roles e.g. ["Admin", "Instructor"]
+ */
+export const verifyRole = (allowedRoles) => {
+  return asyncHandler(async (req, _, next) => {
+    if (!req.user) {
+      throw new ApiError(401, "Unauthorized request");
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      throw new ApiError(
+        403,
+        `Access denied. Only ${allowedRoles.join(" or ")} can perform this action.`
+      );
+    }
+
+    next();
+  });
+};

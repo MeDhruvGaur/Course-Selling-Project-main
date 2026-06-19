@@ -1,8 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
-import { 
-  HomePage, 
-  LoginPage, 
-  CourseDetailsPage, 
+import {
+  HomePage,
+  LoginPage,
+  CourseDetailsPage,
   CartPage,
   Registration,
   AdminLoginPage,
@@ -22,7 +22,7 @@ export function MyRouter() {
       path: "/registration",
       element: <Registration />,
     },
-    
+
     // Admin Routes
     {
       path: "/admin/login",
@@ -36,7 +36,7 @@ export function MyRouter() {
         </ProtectedRoute>
       ),
     },
-    
+
     // LMS Application Routes (wrapped in Navbar + Footer)
     {
       path: "/",
