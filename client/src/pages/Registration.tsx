@@ -16,6 +16,7 @@ import {
 import { Form, Input, Button, Select, message } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import { registerApi } from "../services/api";
+import useAuthStore from "../store/store.ts";
 
 const { Option } = Select;
 
@@ -31,6 +32,7 @@ interface RegisterPayload {
 const RegistrationPage: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const { setStore } = useAuthStore();
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["register"],
@@ -38,9 +40,10 @@ const RegistrationPage: React.FC = () => {
       const { data } = await registerApi(payload);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setStore(data.data.user, data.data.accessToken, data.data.refreshToken);
       message.success("Registration successful!");
-      navigate("/login");
+      navigate("/");
     },
     onError: (error: any) => {
       message.error(
@@ -74,7 +77,6 @@ const RegistrationPage: React.FC = () => {
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-lms-gold-500 to-yellow-600 flex items-center justify-center">
             <BookOpen className="w-5 h-5 text-lms-blue-950" />
           </div>
-
           <div>
             <span className="text-white font-bold text-lg">Learn</span>
             <span className="text-lms-gold-500 font-bold text-lg">Pro</span>
@@ -95,90 +97,67 @@ const RegistrationPage: React.FC = () => {
               <Sparkles size={14} />
               Create Account
             </div>
-
             <h1 className="text-3xl font-bold text-white mt-4">Register</h1>
-
             <p className="text-slate-400 mt-2">Create your LearnPro account.</p>
           </div>
 
           <Form layout="vertical" requiredMark={false} onFinish={onFinish}>
             <Form.Item
-              label="Full Name"
+              label={<span className="text-slate-300">Full Name</span>}
               name="fullName"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter full name",
-                },
-              ]}
+              rules={[{ required: true, message: "Please enter full name" }]}
             >
               <Input
                 size="large"
-                prefix={<User size={16} />}
+                prefix={<User size={16} className="text-slate-400" />}
                 placeholder="John Doe"
               />
             </Form.Item>
 
             <Form.Item
-              label="Username"
+              label={<span className="text-slate-300">Username</span>}
               name="username"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter username",
-                },
-              ]}
+              rules={[{ required: true, message: "Please enter username" }]}
             >
               <Input
                 size="large"
-                prefix={<User size={16} />}
+                prefix={<User size={16} className="text-slate-400" />}
                 placeholder="john123"
               />
             </Form.Item>
 
             <Form.Item
-              label="Email"
+              label={<span className="text-slate-300">Email</span>}
               name="email"
               rules={[
-                {
-                  required: true,
-                  message: "Please enter email",
-                },
-                {
-                  type: "email",
-                  message: "Please enter a valid email",
-                },
+                { required: true, message: "Please enter email" },
+                { type: "email", message: "Please enter a valid email" },
               ]}
             >
               <Input
                 size="large"
-                prefix={<Mail size={16} />}
+                prefix={<Mail size={16} className="text-slate-400" />}
                 placeholder="john@example.com"
               />
             </Form.Item>
 
             <Form.Item
-              label="Password"
+              label={<span className="text-slate-300">Password</span>}
               name="password"
               rules={[
-                {
-                  required: true,
-                  message: "Please enter password",
-                },
-                {
-                  min: 6,
-                  message: "Password must be at least 6 characters",
-                },
+                { required: true, message: "Please enter password" },
+                { min: 6, message: "Password must be at least 6 characters" },
               ]}
             >
               <Input
                 size="large"
                 type={showPassword ? "text" : "password"}
-                prefix={<Lock size={16} />}
+                prefix={<Lock size={16} className="text-slate-400" />}
                 suffix={
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    className="text-slate-400 hover:text-white"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -187,28 +166,27 @@ const RegistrationPage: React.FC = () => {
             </Form.Item>
 
             <Form.Item
-              label="Role"
+              label={<span className="text-slate-300">Role</span>}
               name="role"
               initialValue="Student"
-              rules={[
-                {
-                  required: true,
-                  message: "Please select a role",
-                },
-              ]}
+              rules={[{ required: true, message: "Please select a role" }]}
             >
               <Select size="large">
-                <Option value="Student">User</Option>
+                <Option value="Student">Student</Option>
                 <Option value="Instructor">Instructor</Option>
                 <Option value="Admin">Admin</Option>
               </Select>
             </Form.Item>
 
-            <Form.Item label="Description (Optional)" name="description">
+            <Form.Item
+              label={
+                <span className="text-slate-300">Description (Optional)</span>
+              }
+              name="description"
+            >
               <Input.TextArea
                 rows={3}
                 placeholder="Tell us something about yourself..."
-                prefix={<FileText size={16} />}
               />
             </Form.Item>
 
@@ -217,8 +195,12 @@ const RegistrationPage: React.FC = () => {
               loading={isPending}
               className="w-full h-12 bg-lms-gold-500 text-lms-blue-950 font-bold rounded-xl border-none"
             >
-              Create Account
-              <ArrowRight size={16} className="inline ml-2" />
+              {!isPending && (
+                <>
+                  Create Account
+                  <ArrowRight size={16} className="inline ml-2" />
+                </>
+              )}
             </Button>
           </Form>
 

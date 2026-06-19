@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+
 const userSchema = new mongoose.Schema(
   {
     fullName: {
@@ -33,27 +34,35 @@ const userSchema = new mongoose.Schema(
       enum: ["Admin", "Instructor", "Student"],
       default: "Student",
     },
+    description: {
+      type: String,
+      trim: true,
+    },
     refreshToken: {
       type: String,
     },
     cart: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
       ref: "Cart",
+      // required: true HATAYA — register ke waqt cart nahi hota
     },
   },
   { timestamps: true }
 );
-userSchema.pre("save", async function (next) {
+
+// Password hash karo save se pehlev
+userSchema.pre("save", async function (next) {  // regular function
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
+// Password verify karo
 userSchema.methods.isPasswordCorrect = async function (oldPassword) {
   return await bcrypt.compare(oldPassword, this.password);
 };
 
+// Access Token generate karo
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
@@ -68,6 +77,8 @@ userSchema.methods.generateAccessToken = function () {
     }
   );
 };
+
+// Refresh Token generate karo
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
