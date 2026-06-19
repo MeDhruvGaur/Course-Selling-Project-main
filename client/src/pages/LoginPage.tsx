@@ -49,7 +49,11 @@ const LoginPage: React.FC = () => {
 
       message.success("Login successful!");
 
-      navigate("/");
+      if (user.role === "Admin" || user.role === "Instructor") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
     },
 
     onError: (error: any) => {
@@ -112,9 +116,9 @@ const LoginPage: React.FC = () => {
             </p>
           </div>
 
-          <Form layout="vertical" requiredMark={false} onFinish={onFinish}>
+          <Form layout="vertical" requiredMark={false} onFinish={onFinish} className="lms-login-input">
             <Form.Item
-              label="Email"
+              label={<span className="text-slate-300">Email</span>}
               name="email"
               rules={[
                 {
@@ -135,7 +139,7 @@ const LoginPage: React.FC = () => {
             </Form.Item>
 
             <Form.Item
-              label="Password"
+              label={<span className="text-slate-300">Password</span>}
               name="password"
               rules={[
                 {
@@ -152,6 +156,7 @@ const LoginPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    className="text-slate-400 hover:text-white"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>

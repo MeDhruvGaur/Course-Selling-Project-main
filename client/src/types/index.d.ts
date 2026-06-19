@@ -8,9 +8,7 @@ type UserRegisterPayload = {
   fullName: string;
   email: string;
   password: string;
-  mobile: number;
-  primaryRole: number;
-  status: string;
+  role: "Admin" | "Instructor" | "Student";
 };
 
 type Instructor = {

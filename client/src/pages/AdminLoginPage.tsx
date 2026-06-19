@@ -43,13 +43,13 @@ const LoginPage = () => {
 
       setStore(user, accessToken, refreshToken);
 
-      navigate("/");
+      navigate("/admin/dashboard");
     },
 
     onError: (error) => {
       message.error(
         error?.response?.data?.message ||
-          "Invalid email or password. Please try again.",
+        "Invalid email or password. Please try again.",
       );
     },
   });

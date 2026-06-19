@@ -46,10 +46,9 @@ const userSchema = new mongoose.Schema(
 );
 
 // Password hash karo save se pehlev
-userSchema.pre("save", async function (next) {  // regular function
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {  // regular function
+  if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 10);
-  next();
 });
 
 // Password verify karo

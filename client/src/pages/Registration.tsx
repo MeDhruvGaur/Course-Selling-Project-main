@@ -16,7 +16,7 @@ import {
 import { Form, Input, Button, Select, message } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import { registerApi } from "../services/api";
-import useAuthStore from "../store/store.ts";
+import useAuthStore from "../store/store";
 
 const { Option } = Select;
 
@@ -38,12 +38,17 @@ const RegistrationPage: React.FC = () => {
     mutationKey: ["register"],
     mutationFn: async (payload: RegisterPayload) => {
       const { data } = await registerApi(payload);
-      return data;
+      return data.data;
     },
-    onSuccess: (data) => {
-      setStore(data.data.user, data.data.accessToken, data.data.refreshToken);
+    onSuccess: (data: any) => {
+      const { user, accessToken, refreshToken } = data;
+      setStore(user, accessToken, refreshToken);
       message.success("Registration successful!");
-      navigate("/");
+      if (user.role === "Admin" || user.role === "Instructor") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
     },
     onError: (error: any) => {
       message.error(
@@ -101,7 +106,12 @@ const RegistrationPage: React.FC = () => {
             <p className="text-slate-400 mt-2">Create your LearnPro account.</p>
           </div>
 
-          <Form layout="vertical" requiredMark={false} onFinish={onFinish}>
+          <Form
+            layout="vertical"
+            requiredMark={false}
+            onFinish={onFinish}
+            className="lms-login-input"
+          >
             <Form.Item
               label={<span className="text-slate-300">Full Name</span>}
               name="fullName"
