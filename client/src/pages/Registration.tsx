@@ -11,7 +11,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Sparkles,
-  FileText,
 } from "lucide-react";
 import { Form, Input, Button, Select, message } from "antd";
 import { useMutation } from "@tanstack/react-query";
@@ -53,7 +52,7 @@ const RegistrationPage: React.FC = () => {
     onError: (error: any) => {
       message.error(
         error?.response?.data?.message ||
-          "Registration failed. Please try again.",
+        "Registration failed. Please try again.",
       );
     },
   });

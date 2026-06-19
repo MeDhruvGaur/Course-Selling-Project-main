@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Password hash karo save se pehlev
+// Password hash karo save se pehle
 userSchema.pre("save", async function () {  // regular function
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 10);

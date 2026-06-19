@@ -130,10 +130,10 @@ const LmsNavbar = () => {
                 <button className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
                   <Avatar
                     size={32}
-                    src={user?.avatar}
-                    icon={<User className="w-4 h-4" />}
-                    className="border-2 border-lms-gold-500/30 bg-lms-blue-800!"
-                  />
+                    className="border-2 border-lms-gold-500/30 bg-lms-blue-800! font-bold text-lms-gold-500 flex items-center justify-center"
+                  >
+                    {user?.fullName?.charAt(0) || user?.username?.charAt(0) || "U"}
+                  </Avatar>
                 </button>
               </Dropdown>
             ) : (

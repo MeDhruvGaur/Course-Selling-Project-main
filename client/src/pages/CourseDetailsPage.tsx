@@ -224,18 +224,8 @@ const CourseDetailsPage = () => {
                 {/* Instructor */}
                 {instructor && (
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-lms-gold-500/30">
-                      {instructor.avatar ? (
-                        <img
-                          src={instructor.avatar}
-                          alt={instructor.fullName}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-lms-blue-700 flex items-center justify-center">
-                          <User className="w-5 h-5 text-slate-300" />
-                        </div>
-                      )}
+                    <div className="w-10 h-10 rounded-full bg-lms-blue-700 flex items-center justify-center border-2 border-lms-gold-500/30 text-white font-bold uppercase">
+                      {instructor.fullName?.charAt(0) || "I"}
                     </div>
                     <div>
                       <p className="text-xs text-slate-400">Created by</p>
@@ -388,18 +378,8 @@ const CourseDetailsPage = () => {
                   Instructor
                 </h2>
                 <div className="flex items-center gap-5">
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-lms-gold-500/20 shrink-0">
-                    {instructor.avatar ? (
-                      <img
-                        src={instructor.avatar}
-                        alt={instructor.fullName}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-lms-blue-100 flex items-center justify-center">
-                        <User className="w-8 h-8 text-lms-blue-600" />
-                      </div>
-                    )}
+                  <div className="w-20 h-20 rounded-2xl bg-lms-blue-100 flex items-center justify-center border-2 border-lms-gold-500/20 shrink-0 text-lms-blue-600 text-2xl font-bold uppercase">
+                    {instructor.fullName?.charAt(0) || "I"}
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-slate-900">

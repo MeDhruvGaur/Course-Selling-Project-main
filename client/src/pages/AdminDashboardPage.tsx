@@ -140,12 +140,8 @@ const AdminDashboardPage = () => {
 
         {/* User info */}
         <div className="p-4 border-b border-slate-800 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-rose-700 flex items-center justify-center text-white font-bold uppercase overflow-hidden shrink-0">
-            {user?.avatar ? (
-              <img src={user.avatar} alt={user.fullName} className="w-full h-full object-cover" />
-            ) : (
-              user?.fullName?.charAt(0) || "A"
-            )}
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-rose-700 flex items-center justify-center text-white font-bold uppercase shrink-0">
+            {user?.fullName?.charAt(0) || "A"}
           </div>
           <div className="overflow-hidden">
             <p className="text-sm font-semibold text-white truncate">{user?.fullName}</p>

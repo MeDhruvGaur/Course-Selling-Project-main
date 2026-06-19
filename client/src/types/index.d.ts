@@ -15,7 +15,6 @@ type Instructor = {
   _id: string;
   fullName: string;
   email: string;
-  avatar: string;
 };
 
 type Course = {

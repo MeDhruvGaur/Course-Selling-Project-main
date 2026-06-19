@@ -70,7 +70,6 @@ const getAllCourses = asyncHandler(async(req, res)=>{
             $project: {
               fullName: 1,
               email: 1,
-              avatar: 1,
             },
           },
         ],
@@ -105,7 +104,6 @@ const getMyCourses = asyncHandler(async(req, res)=>{
             $project: {
               fullName: 1,
               email: 1,
-              avatar: 1,
             },
           },
         ],
@@ -140,7 +138,6 @@ const getCourseDetails = asyncHandler(async(req, res)=>{
             $project: {
               fullName: 1,
               email: 1,
-              avatar: 1,
             },
           },
         ],
