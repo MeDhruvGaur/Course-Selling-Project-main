@@ -41,19 +41,3 @@ const useAuthStore = create<AuthStore>()(
 );
 
 export default useAuthStore;
-//
-
-//
-//
-//
-//
-
-///
-
-//
-
-//   setUser: (user: any) => set({ user }),
-//   setAccessToken: (accessToken: string) => set({ accessToken }),
-//   setRefreshToken: (refreshToken: string) => set({ refreshToken }),
-//   setIsAuthenticated: (isAuthenticated: boolean) =>
-//     set({ isAuthenticated }),
