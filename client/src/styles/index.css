@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+
+@theme {
+  --color-lms-blue-950: #0a1128;
+  --color-lms-blue-900: #0d1b4a;
+  --color-lms-blue-800: #1a237e;
+  --color-lms-blue-700: #1e3a8a;
+  --color-lms-blue-600: #2563eb;
+  --color-lms-gold-500: #ffc107;
+  --color-lms-gold-400: #ffd740;
+  --color-lms-gold-300: #ffe082;
+  --font-family-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+body {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ant Design dark input overrides for LearnPro login */
+.lms-login-input .ant-input-affix-wrapper,
+.lms-login-input .ant-input,
+.lms-login-input .ant-input-password {
+  background: rgba(10, 17, 40, 0.6) !important;
+  border-color: rgba(30, 58, 138, 0.5) !important;
+  color: #fff !important;
+}
+.lms-login-input .ant-input-affix-wrapper > input.ant-input {
+  background: transparent !important;
+  border: none !important;
+  color: #fff !important;
+}
+.lms-login-input .ant-input-affix-wrapper:hover,
+.lms-login-input .ant-input:hover {
+  border-color: rgba(37, 99, 235, 0.7) !important;
+}
+.lms-login-input .ant-input-affix-wrapper-focused,
+.lms-login-input .ant-input:focus {
+  border-color: #ffc107 !important;
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.15) !important;
+}
+.lms-login-input input::placeholder {
+  color: rgba(148, 163, 184, 0.6) !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a1128;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e3a8a;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
+}
