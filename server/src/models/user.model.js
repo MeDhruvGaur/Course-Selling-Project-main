@@ -34,17 +34,12 @@ const userSchema = new mongoose.Schema(
       enum: ["Admin", "Instructor", "Student"],
       default: "Student",
     },
-    description: {
-      type: String,
-      trim: true,
-    },
     refreshToken: {
       type: String,
     },
     cart: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Cart",
-      // required: true HATAYA — register ke waqt cart nahi hota
     },
   },
   { timestamps: true }

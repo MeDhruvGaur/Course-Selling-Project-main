@@ -14,7 +14,8 @@ const cookieOptions = {
 
 // ─── Register ─────────────────────────────────────────────────────────────────
 export const registerUser = asyncHandler(async (req, res) => {
-  const { fullName, username, email, password, role, description } = req.body;
+  // "description" remove kiya — model mein field nahi hai
+  const { fullName, username, email, password, role } = req.body;
 
   if (!fullName || !username || !email || !password) {
     throw new ApiError(400, "All fields are required");
@@ -27,13 +28,13 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with this email or username already exists");
   }
 
+  // role enum: "Admin" | "Instructor" | "Student" (default: "Student")
   const user = await User.create({
     fullName,
     username: username.toLowerCase(),
     email,
     password,
     role: role || "Student",
-    description: description || "",
   });
 
   const cart = await Cart.create({ user: user._id, items: [] });
@@ -194,16 +195,16 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
 
 // ─── Update Account Details ───────────────────────────────────────────────────
 export const updateAccountDetails = asyncHandler(async (req, res) => {
-  const { fullName, email, description } = req.body;
+  // "description" remove kiya — model mein field nahi hai
+  const { fullName, email } = req.body;
 
-  if (!fullName && !email && !description) {
+  if (!fullName && !email) {
     throw new ApiError(400, "At least one field is required to update");
   }
 
   const updateFields = {};
   if (fullName) updateFields.fullName = fullName;
   if (email) updateFields.email = email;
-  if (description) updateFields.description = description;
 
   const user = await User.findByIdAndUpdate(
     req.user._id,

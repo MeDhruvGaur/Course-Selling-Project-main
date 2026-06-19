@@ -178,18 +178,6 @@ const RegistrationPage: React.FC = () => {
               </Select>
             </Form.Item>
 
-            <Form.Item
-              label={
-                <span className="text-slate-300">Description (Optional)</span>
-              }
-              name="description"
-            >
-              <Input.TextArea
-                rows={3}
-                placeholder="Tell us something about yourself..."
-              />
-            </Form.Item>
-
             <Button
               htmlType="submit"
               loading={isPending}
